@@ -20,5 +20,6 @@ urlpatterns = [
     path('add/', views.addUser),
     path('update/<str:pk>/', views.updateUser),
     path('delete/<str:pk>/', views.deleteUser),
+	path('api/login/', views.LoginAPIView.as_view(), name='api_login'),
 	path('api-auth/', include('rest_framework.urls'))
 ]

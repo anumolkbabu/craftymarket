@@ -21,6 +21,11 @@ class LoginSerializer(serializers.ModelSerializer):
         model = Login
         fields = '__all__'
 
+# signin serilizer
+class SigninSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField()
+
 # not required but can be used
 class LoginPostSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)

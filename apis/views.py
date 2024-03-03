@@ -1,11 +1,12 @@
 # from django.shortcuts import render
 # import viewsets
 from rest_framework import viewsets
+from rest_framework import status
 
 # response and decroater
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-
+from rest_framework.views import APIView
 # import local data
 from .serializers import *
 from .models import GeeksModel
@@ -31,6 +32,7 @@ class GeeksViewSet(viewsets.ModelViewSet):
 	# specify serializer to be used
 	serializer_class = GeeksSerializer
 
+# ---------------------------------           login    -start    ----------------------------------
 @api_view(['GET'])
 def getUser(request, pk):
 	# Query all user instances
@@ -44,13 +46,14 @@ def getUser(request, pk):
 @api_view(['GET'])
 def getUsers(request):
 	# Query all user instances
-    all_users = Login.objects.all()
-
+    task = Login.objects.all()
     # Serialize the user instances
-    serialized_users = [{'id': user.id, 'name': user.name} for user in all_users]
+    # serialized_users = [{'id': user.id, 'name': user.name} for user in all_users]
+
+    serializer = LoginSerializer(task, many=True)
 
     # Return JSON response
-    return Response(serialized_users)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def addUser(request):
@@ -59,6 +62,32 @@ def addUser(request):
 		serializer.save()
 	return Response(serializer.data)
 
+# view for signin -- check is valid emailId and password
+class LoginAPIView(APIView):
+    def post(self, request):
+        serializer = SigninSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
+            try:
+                user = Login.objects.get(email=email)
+                passw = Login.objects.get(password=password)
+                # Correct indentation for user_data
+                user_data = {
+                    'username': user.name,
+                    'email': user.email,
+					'id': user.id,
+                    # Add more fields as needed
+                }
+                if user and passw:
+                    return Response({'message':'Login Success !','data':user_data}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+            except Login.DoesNotExist:
+                return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# update user details
 @api_view(['PUT'])
 def updateUser(request, pk):
 	task = Login.objects.get(id=pk)
@@ -81,3 +110,5 @@ def deleteUser(request, pk):
 # 	if serializer.is_valid():
 # 		serializer.save()
 # 	return Response(serializer.data)
+
+# ---------------------------------           login    - end    ----------------------------------
