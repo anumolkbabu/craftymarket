@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Roles(models.Model):
+    roleid=models.IntegerField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     rolename = models.CharField(max_length=25)
 class Login(models.Model):
     name = models.CharField(max_length=200)
