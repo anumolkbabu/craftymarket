@@ -10,9 +10,9 @@ from rest_framework.views import APIView
 # import local data
 from .serializers import *
 from .models import GeeksModel
-# login model and serializer
-from login.models import Login
 
+# login model and serializer
+from login.models import Login,Category
 # http request import for frontend api call
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -82,9 +82,9 @@ class LoginAPIView(APIView):
                 if user and passw:
                     return Response({'message':'Login Success !','data':user_data}, status=status.HTTP_200_OK)
                 else:
-                    return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({'message': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
             except Login.DoesNotExist:
-                return Response({'error': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'message': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # update user details
@@ -112,3 +112,28 @@ def deleteUser(request, pk):
 # 	return Response(serializer.data)
 
 # ---------------------------------           login    - end    ----------------------------------
+#------------------------------------------Category-----------------------------------------------------
+
+# 1. get categorys
+
+@api_view(['GET'])
+def getCategorys(request):
+	# Query all user instances
+    task = Category.objects.all()
+    
+    # Serialize the user instances
+    serializer = CategorySerializer(task, many=True)
+
+    # Return JSON response
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# 2. add category
+
+@api_view(['POST'])
+def addCategorys(request):
+	serializer = CategorySerializer(data=request.data)
+	if serializer.is_valid():
+		serializer.save()
+	return Response(serializer.data)
+
+#________________________________________Product-----------------------------------------------

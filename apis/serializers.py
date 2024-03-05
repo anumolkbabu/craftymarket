@@ -4,10 +4,8 @@ from django.contrib.auth import authenticate
 
 # import model from models.py
 from .models import GeeksModel
-
 # login model
-from login.models import Login
-
+from login.models import Login, Category ,Product
 # Create a model serializer
 class GeeksSerializer(serializers.HyperlinkedModelSerializer):
 	# specify model and fields
@@ -32,3 +30,9 @@ class LoginPostSerializer(serializers.Serializer):
 
     def create(self,validated_data):
         return Login.objects.create(**validated_data)
+#-----------------------Category---------------------------------------------
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+#______________________________________Product____________________________________________________

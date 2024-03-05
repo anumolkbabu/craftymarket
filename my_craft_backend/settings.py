@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apis',
     'login',
     "corsheaders",
+   
 ]
 
 MIDDLEWARE = [
