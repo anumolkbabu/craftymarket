@@ -19,6 +19,11 @@ class LoginSerializer(serializers.ModelSerializer):
         model = Login
         fields = '__all__'
 
+class UserEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Login
+        fields =[ 'email']
+
 # signin serilizer
 class SigninSerializer(serializers.Serializer):
     email = serializers.CharField()

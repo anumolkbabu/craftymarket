@@ -55,12 +55,34 @@ def getUsers(request):
     # Return JSON response
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def getEmails(request):
+	# Query all user instances
+    task = Login.objects.all()
+    # Serialize the user instances
+    # serialized_users = [{'id': user.id, 'name': user.name} for user in all_users]
+
+    serializer = UserEmailSerializer(task, many=True)
+
+    # Return JSON response
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def addUser(request):
-	serializer = LoginSerializer(data=request.data)
-	if serializer.is_valid():
-		serializer.save()
-	return Response(serializer.data)
+    try:
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            modified_data =serializer.data
+            if 'password' in modified_data:
+                del modified_data['password']
+            data_to_send = {'message': 'User added successfully', 'data': modified_data}
+            return Response(data_to_send, status=status.HTTP_201_CREATED)
+        else:
+            errors = serializer.errors
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # view for signin -- check is valid emailId and password
 class LoginAPIView(APIView):
@@ -77,6 +99,7 @@ class LoginAPIView(APIView):
                     'username': user.name,
                     'email': user.email,
 					'id': user.id,
+                    'craftmaker': user.craftmaker
                     # Add more fields as needed
                 }
                 if user and passw:
@@ -85,7 +108,9 @@ class LoginAPIView(APIView):
                     return Response({'message': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
             except Login.DoesNotExist:
                 return Response({'message': 'User does not exist'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Login.MultipleObjectsReturned:
+                return Response({'message': 'Duplicate Users'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message':"something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
 
 # update user details
 @api_view(['PUT'])
@@ -135,5 +160,21 @@ def addCategorys(request):
 	if serializer.is_valid():
 		serializer.save()
 	return Response(serializer.data)
+#.UPDATE CATEGORY
+
+@api_view(['PUT'])
+def updateCategory(request, pk):
+	task = Category.objects.get(categoryid=pk)
+	serializer = CategorySerializer(instance=task, data=request.data)
+	if serializer.is_valid():
+		serializer.save()
+	return Response(serializer.data)
+#delete category
+@api_view(['DELETE'])
+def deleteCategory(request, pk):
+	task = Category.objects.get(categoryid=pk)
+	print(task.categoryname)
+	task.delete()
+	return Response("Category "+task.categoryname+" deleted Sucessfully !")
 
 #________________________________________Product-----------------------------------------------

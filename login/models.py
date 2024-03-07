@@ -23,4 +23,10 @@ class Product(models.Model):
     rating=models.IntegerField()
     productthumbnail=models.CharField(max_length=100)
     productimage=models.ImageField(upload_to='productimages/')
-   # categoryid=models.ForeignKey(Category, on_delete=models.CASCADE)
+    categoryid=models.ForeignKey(Category, on_delete=models.CASCADE)
+class Order(models.Model):
+    oid=models.IntegerField()
+    address=models.CharField(max_length=100)
+    selectpayment=models.IntegerField()
+    
+
