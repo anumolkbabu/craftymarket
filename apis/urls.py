@@ -28,5 +28,10 @@ urlpatterns = [
 	path('addcategory/', views.addCategorys),
 	path('updateCategory/<str:pk>/', views.updateCategory),
 	path('deletecategory/<str:pk>/', views.deleteCategory),
+	path('getProduct/', views.getProduct),
+	path('addProduct/', views.addProduct),
+	path('getOrder/', views.getOrder),
+	path('addOrder/', views.addOrder),
+	
 	path('api-auth/', include('rest_framework.urls'))
 ]

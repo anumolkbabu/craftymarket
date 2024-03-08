@@ -12,7 +12,7 @@ from .serializers import *
 from .models import GeeksModel
 
 # login model and serializer
-from login.models import Login,Category
+from login.models import Login,Category,Product
 # http request import for frontend api call
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -45,12 +45,13 @@ def getUser(request, pk):
 
 @api_view(['GET'])
 def getUsers(request):
-	# Query all user instances
-    task = Login.objects.all()
-    # Serialize the user instances
-    # serialized_users = [{'id': user.id, 'name': user.name} for user in all_users]
+    user_role = request.query_params.get('craftmaker').capitalize()
+    if user_role is not None:
+        users = Login.objects.filter(craftmaker = user_role)
+    else:
+        users = Login.objects.all()
 
-    serializer = LoginSerializer(task, many=True)
+    serializer = LoginSerializer(users, many=True)
 
     # Return JSON response
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -178,3 +179,40 @@ def deleteCategory(request, pk):
 	return Response("Category "+task.categoryname+" deleted Sucessfully !")
 
 #________________________________________Product-----------------------------------------------
+#1.get product
+@api_view(['GET'])
+def getProduct(request):
+	# Query all user instances
+    task = Product.objects.all()
+    
+    # Serialize the user instances
+    serializer = ProductSerializer(task, many=True)
+
+    # Return JSON response
+    return Response(serializer.data, status=status.HTTP_200_OK)
+#2.Add product
+@api_view(['POST'])
+def addProduct(request):
+	serializer = ProductSerializer(data=request.data)
+	if serializer.is_valid():
+		serializer.save()
+	return Response(serializer.data)
+#_________________________________________________________order___________________________________________________
+#1.get order
+@api_view(['GET'])
+def getOrder(request):
+	
+    task = Order.objects.all()
+    
+   
+    serializer = OrderSerializer(task, many=True)
+
+   
+    return Response(serializer.data, status=status.HTTP_200_OK)
+#2.Add order
+@api_view(['POST'])
+def addOrder(request):
+	serializer = OrderSerializer(data=request.data)
+	if serializer.is_valid():
+		serializer.save()
+	return Response(serializer.data)
