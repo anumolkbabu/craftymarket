@@ -20,14 +20,16 @@ urlpatterns = [
 	path('api/account/register', views.addUser),
 	path('api/get-users', views.getUsers),
 	path('api/get-users-emails', views.getEmails),
+	
+	path('api/getcategorys', views.getCategorys,name='api_get_categorys'),
+	path('api/addcategory', views.addCategorys),
+	path('api/updateCategory/<str:pk>', views.updateCategory),
+	path('api/deletecategory/<str:pk>', views.deleteCategory),
 	# testing
 	path('get-user/<str:pk>/', views.getUser),
     path('update/<str:pk>/', views.updateUser),
     path('delete/<str:pk>/', views.deleteUser),
-	path('api/getcategorys/', views.getCategorys,name='api_get_categorys'),
-	path('addcategory/', views.addCategorys),
-	path('updateCategory/<str:pk>/', views.updateCategory),
-	path('deletecategory/<str:pk>/', views.deleteCategory),
+
 	path('getProduct/', views.getProduct),
 	path('addProduct/', views.addProduct),
 	path('getOrder/', views.getOrder),

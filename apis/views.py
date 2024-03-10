@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 # import local data
 from .serializers import *
 from .models import GeeksModel
@@ -45,28 +46,66 @@ def getUser(request, pk):
 
 @api_view(['GET'])
 def getUsers(request):
-    user_role = request.query_params.get('craftmaker').capitalize()
+    # init pagination
+    paginator = PageNumberPagination()
+
+    # get query params
+    user_role = request.query_params.get('craftmaker')
+
+
+
+    # handle user role filtering
     if user_role is not None:
-        users = Login.objects.filter(craftmaker = user_role)
+        users = Login.objects.filter(craftmaker = user_role.capitalize())
     else:
         users = Login.objects.all()
 
+    # serialize to give back response
     serializer = LoginSerializer(users, many=True)
 
     # Return JSON response
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return JsonResponse({'results':serializer.data})
+
+
+# @api_view(['GET'])
+# def getUsers(request):
+#     # init pagination
+#     paginator = PageNumberPagination()
+
+#     # get query params
+#     user_role = request.query_params.get('craftmaker')
+#     page_size = request.query_params.get('page_size')
+
+#     # handle pagination sizing
+#     if page_size is not None:
+#         paginator.page_size = page_size 
+#     else:
+#         paginator.page_size = 5  # Set your desired page size here
+
+#     # handle user role filtering
+#     if user_role is not None:
+#         users = Login.objects.filter(craftmaker = user_role.capitalize())
+#     else:
+#         users = Login.objects.all()
+
+#     # serialize to give back response
+#     result_page = paginator.paginate_queryset(users, request)
+#     serializer = LoginSerializer(result_page, many=True)
+
+#     # Return JSON response
+#     return paginator.get_paginated_response(serializer.data)
 
 @api_view(['GET'])
 def getEmails(request):
 	# Query all user instances
-    task = Login.objects.all()
+    # flat provides only email in list
+    task = Login.objects.order_by('email').values_list('email', flat=True).distinct()
     # Serialize the user instances
-    # serialized_users = [{'id': user.id, 'name': user.name} for user in all_users]
+    email_list = [user['email'] for user in [{'email': user} for user in task]]
 
-    serializer = UserEmailSerializer(task, many=True)
-
-    # Return JSON response
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    distinct_email_list = list(email_list)
+    
+    return JsonResponse({'results': distinct_email_list}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def addUser(request):
@@ -151,7 +190,7 @@ def getCategorys(request):
     serializer = CategorySerializer(task, many=True)
 
     # Return JSON response
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return JsonResponse({'results':serializer.data}, status=status.HTTP_200_OK)
 
 # 2. add category
 
